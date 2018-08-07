@@ -8,7 +8,7 @@
 
 import sys
 import re
-
+from collections import OrderedDict
 """Baby Names exercise
 
 Define the extract_names() function below and change main()
@@ -41,7 +41,25 @@ def extract_names(filename):
   ['2006', 'Aaliyah 91', Aaron 57', 'Abagail 895', ' ...]
   """
   # +++your code here+++
-  return
+  f = open(filename, "r")
+  string = f.read()
+  f.close()
+  year = re.findall(r'>Popularity in (\d+)<', string)
+  names_and_ranks = re.findall(r'<td>(\d+)</td><td>(\w+)</td><td>(\w+)</td>', string)
+  my_ordered_list = sorted(names_and_ranks, key=lambda x: int(x[0]))
+  my_dict = {}
+  dict_list = []
+  dict_list.append(year[0])
+  for x in my_ordered_list:
+    if x[1] not in my_dict:
+      my_dict[x[1]] = x[0]
+    if x[2] not in my_dict:
+      my_dict[x[2]] = x[0]
+  my_dict = OrderedDict(sorted(my_dict.items(), key=lambda t: t[0]))
+  for key, value in my_dict.iteritems():
+    dict_list.append("{} {}".format(key, value))
+  text = '\n'.join(dict_list) + '\n'
+  return text
 
 
 def main():
@@ -59,10 +77,17 @@ def main():
   if args[0] == '--summaryfile':
     summary = True
     del args[0]
-
   # +++your code here+++
   # For each filename, get the names, then either print the text output
   # or write it to a summary file
+  if summary == False:
+    print extract_names(args[0])
+  else:
+    for arg in args:
+      f = open("{}.summary".format(arg),"w+")
+      f.write("{}".format(extract_names(arg)))
+      f.close()
+    
   
 if __name__ == '__main__':
   main()
